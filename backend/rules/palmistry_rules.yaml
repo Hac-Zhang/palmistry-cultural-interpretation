@@ -1,0 +1,25 @@
+version: "1.0.0"
+positioning: "traditional_culture_entertainment"
+sources:
+  - title: "麻衣相法"
+    role: "传统相学术语与分类的文化来源"
+  - title: "中国手相学·掌相入门"
+    author: "陈鼎龙"
+    role: "现代中文入门术语与图示对照"
+lines:
+  life_line:
+    aliases: ["生命线"]
+    observation_features: ["起点", "走向", "连续性", "深浅", "分叉", "链状", "岛状"]
+    interpretation: "传统手相通常将较清晰、连续的形态象征为精力与生活节奏较稳定；仅供文化参考。"
+    forbidden_claims: ["寿命", "疾病", "心血管", "诊断"]
+  head_line:
+    aliases: ["智慧线", "头脑线"]
+    observation_features: ["起点", "横向走向", "下垂程度", "长度", "连续性", "末端分叉"]
+    interpretation: "传统手相通常把偏平直的形态与分析取向联系起来，把明显下垂的形态与想象力取向联系起来；不代表能力测评。"
+    forbidden_claims: ["智商", "人格障碍", "职业适配", "诊断"]
+  heart_line:
+    aliases: ["感情线"]
+    observation_features: ["小指侧起点", "弧度", "终点位置", "连续性", "分叉", "链状"]
+    interpretation: "传统手相通常将弧度和分叉作为情感表达风格的象征性线索；不代表真实关系结果。"
+    forbidden_claims: ["婚姻成败", "出轨", "心理疾病", "确定性事件"]
+forbidden_global_claims: ["会得", "一定会", "注定", "寿命", "癌症", "心脏病", "抑郁症", "焦虑症"]
