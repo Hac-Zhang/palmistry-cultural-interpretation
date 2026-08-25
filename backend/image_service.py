@@ -16,6 +16,7 @@ except Exception:  # optional at runtime; quality checks still work without it
 @dataclass
 class PreparedImage:
     original_data_uri: str
+    overview_data_uri: str
     crop_data_uri: str
     enhanced_data_uri: str
     score: float
@@ -33,6 +34,16 @@ def _encode_bgr(image: np.ndarray, quality: int = 92) -> bytes:
     if not ok:
         raise ValueError("image encoding failed")
     return encoded.tobytes()
+
+
+def _overview_bgr(image: np.ndarray, max_edge: int = 1800) -> np.ndarray:
+    """Create a complete-hand overview without dropping wrist or side edges."""
+    height, width = image.shape[:2]
+    edge = max(height, width)
+    if edge <= max_edge:
+        return image
+    scale = max_edge / edge
+    return cv2.resize(image, (max(1, int(width * scale)), max(1, int(height * scale))), interpolation=cv2.INTER_AREA)
 
 
 def _quality(gray: np.ndarray, crop_ratio: float) -> tuple[float, list[str]]:
@@ -111,7 +122,9 @@ def prepare_image(image_bytes: bytes, mime: str) -> PreparedImage:
                 h, w = bgr.shape[:2]
                 xs = [p.x * w for p in points]
                 ys = [p.y * h for p in points]
-                pad_x, pad_y = 0.12 * w, 0.12 * h
+                # Keep a generous border so palm edges, wrist and little-finger
+                # side lines remain available to the local view.
+                pad_x, pad_y = 0.22 * w, 0.22 * h
                 x1, x2 = max(0, int(min(xs) - pad_x)), min(w, int(max(xs) + pad_x))
                 y1, y2 = max(0, int(min(ys) - pad_y)), min(h, int(max(ys) + pad_y))
                 if x2 > x1 and y2 > y1:
@@ -137,8 +150,10 @@ def prepare_image(image_bytes: bytes, mime: str) -> PreparedImage:
     clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
     enhanced = clahe.apply(crop_gray)
     enhanced_bgr = cv2.cvtColor(enhanced, cv2.COLOR_GRAY2BGR)
+    overview = _overview_bgr(bgr)
     return PreparedImage(
         original_data_uri=_data_uri(image_bytes, mime),
+        overview_data_uri=_data_uri(_encode_bgr(overview, quality=86)),
         crop_data_uri=_data_uri(_encode_bgr(crop)),
         enhanced_data_uri=_data_uri(_encode_bgr(enhanced_bgr)),
         score=score,

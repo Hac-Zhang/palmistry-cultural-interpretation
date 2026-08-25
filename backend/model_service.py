@@ -112,9 +112,11 @@ OUTPUT FORMAT:
     content = [
         {"type": "text", "text": f"{system_prompt}\n规则版本：{rule_version}\n规则摘要：{json.dumps(rules['lines'], ensure_ascii=False)}"},
         {"type": "text", "text": f"内部图像质量：{_quality_label(quality_score)}；问题：{issues or '无'}"},
-        # The crop and CLAHE view contain the relevant palm evidence. Avoid sending
-        # the duplicate full-resolution original to reduce upstream vision latency.
+        {"type": "text", "text": "视图一：完整掌心概览图。请先用它判断掌底、掌侧、腕部和整体纹势，不要依据局部图推断缺失区域。"},
+        {"type": "image_url", "image_url": {"url": prepared.overview_data_uri, "detail": "low"}},
+        {"type": "text", "text": "视图二：保留较宽边界的掌心局部图。请用它观察三才纹、玉柱纹和家风纹的走向。"},
         {"type": "image_url", "image_url": {"url": prepared.crop_data_uri, "detail": "high"}},
+        {"type": "text", "text": "视图三：局部 CLAHE 增强图。仅用于辅助辨认浅纹，不得把增强噪声当作真实纹路。"},
         {"type": "image_url", "image_url": {"url": prepared.enhanced_data_uri, "detail": "high"}},
     ]
     payload = {"model": model, "temperature": 0.55, "response_format": {"type": "json_object"}, "messages": [{"role": "system", "content": system_prompt}, {"role": "user", "content": content}]}
