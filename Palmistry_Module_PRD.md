@@ -67,26 +67,27 @@
 
 ```json
 {
-  "technical_metrics": {"image_quality": "High|Medium|Low", "confidence_score": 0},
   "observations": {
-    "earth_line": "",
-    "human_line": "",
-    "heaven_line": "",
-    "jade_pillar_line": "",
-    "family_ethos_line": ""
+    "earth": "",
+    "human": "",
+    "heaven": "",
+    "jade": "",
+    "family": ""
   },
   "analysis": {
-    "foundation": "",
-    "wisdom": "",
-    "karma": "",
-    "career": "",
-    "marriage": ""
+    "classical": {"foundation": "", "wisdom": "", "karma": "", "career": "", "marriage": ""},
+    "modern": {"foundation": "", "wisdom": "", "karma": "", "career": "", "marriage": ""}
+  },
+  "timeline": {
+    "early_years": {"title": "早年启蒙：潜龙勿用", "classical": "", "modern": ""},
+    "middle_years": {"title": "中流砥柱：见龙在田", "classical": "", "modern": ""},
+    "later_years": {"title": "晚景秋收：飞龙在天", "classical": "", "modern": ""}
   },
   "master_pan_ci": "潜龙在渊，静待时飞"
 }
 ```
 
-`technical_metrics` 只供前端做视觉效果，不直接展示给用户。免责声明由服务端固定追加，在报告底部统一展示；模型正文不重复输出免责声明。
+免责声明由服务端固定追加，在报告底部统一展示；模型正文不重复输出免责声明。流年法是传统文化叙事，不用于寿命或确定性事件预测。
 
 ## 7. 非功能要求
 
