@@ -112,7 +112,8 @@ OUTPUT FORMAT:
     content = [
         {"type": "text", "text": f"{system_prompt}\n规则版本：{rule_version}\n规则摘要：{json.dumps(rules['lines'], ensure_ascii=False)}"},
         {"type": "text", "text": f"内部图像质量：{_quality_label(quality_score)}；问题：{issues or '无'}"},
-        {"type": "image_url", "image_url": {"url": prepared.original_data_uri, "detail": "high"}},
+        # The crop and CLAHE view contain the relevant palm evidence. Avoid sending
+        # the duplicate full-resolution original to reduce upstream vision latency.
         {"type": "image_url", "image_url": {"url": prepared.crop_data_uri, "detail": "high"}},
         {"type": "image_url", "image_url": {"url": prepared.enhanced_data_uri, "detail": "high"}},
     ]
