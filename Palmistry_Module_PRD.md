@@ -71,12 +71,16 @@
   "observations": {
     "earth_line": "",
     "human_line": "",
-    "heaven_line": ""
+    "heaven_line": "",
+    "jade_pillar_line": "",
+    "family_ethos_line": ""
   },
   "analysis": {
     "foundation": "",
     "wisdom": "",
-    "karma": ""
+    "karma": "",
+    "career": "",
+    "marriage": ""
   },
   "master_pan_ci": "潜龙在渊，静待时飞"
 }
