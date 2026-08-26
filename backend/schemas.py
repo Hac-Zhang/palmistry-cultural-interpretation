@@ -10,11 +10,11 @@ class Observations(BaseModel):
 
 
 class BilingualAnalysis(BaseModel):
-    foundation: str = Field(min_length=100, max_length=150)
-    wisdom: str = Field(min_length=100, max_length=150)
-    karma: str = Field(min_length=100, max_length=150)
-    career: str = Field(min_length=100, max_length=150)
-    marriage: str = Field(min_length=100, max_length=150)
+    foundation: str = Field(min_length=1, max_length=150)
+    wisdom: str = Field(min_length=1, max_length=150)
+    karma: str = Field(min_length=1, max_length=150)
+    career: str = Field(min_length=1, max_length=150)
+    marriage: str = Field(min_length=1, max_length=150)
 
 
 class Analysis(BaseModel):
@@ -24,8 +24,8 @@ class Analysis(BaseModel):
 
 class TimelineStage(BaseModel):
     title: str = Field(max_length=120)
-    classical: str = Field(min_length=100, max_length=150)
-    modern: str = Field(min_length=100, max_length=150)
+    classical: str = Field(min_length=1, max_length=150)
+    modern: str = Field(min_length=1, max_length=150)
 
 
 class Timeline(BaseModel):

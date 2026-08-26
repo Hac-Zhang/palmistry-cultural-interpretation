@@ -41,22 +41,14 @@ def _text(value: object, fallback: str, limit: int = 1400) -> str:
     return fallback
 
 
-def _bounded_long_text(value: object, fallback: str, mode: str) -> str:
-    """Keep every bilingual paragraph within the product's 100–150 char contract."""
-    text = _text(value, fallback, 150)
-    suffix = (
-        "此象贵在守中蓄势，勿以一时得失乱其方寸，静观时机而行。"
-        if mode == "classical"
-        else "你可以把这份提醒落到一个具体行动上，给自己留出复盘和调整的空间。"
-    )
-    while len(text) < 100:
-        text += suffix
-    return text[:150]
+def _bounded_long_text(value: object, fallback: str) -> str:
+    """Keep the model's wording intact; never manufacture filler text."""
+    return _text(value, fallback, 150)
 
 
 def _stage(raw: object, title: str, classical: str, modern: str) -> dict:
     item = raw if isinstance(raw, dict) else {}
-    return {"title": _text(item.get("title"), title, 120), "classical": _bounded_long_text(item.get("classical"), classical, "classical"), "modern": _bounded_long_text(item.get("modern"), modern, "modern")}
+    return {"title": _text(item.get("title"), title, 120), "classical": _bounded_long_text(item.get("classical"), classical), "modern": _bounded_long_text(item.get("modern"), modern)}
 
 
 def _normalize_payload(raw: dict) -> dict:
@@ -73,18 +65,30 @@ def _normalize_payload(raw: dict) -> dict:
     classical_raw = raw_analysis.get("classical") if isinstance(raw_analysis.get("classical"), dict) else {}
     modern_raw = raw_analysis.get("modern") if isinstance(raw_analysis.get("modern"), dict) else {}
     old_map = {"foundation": old.get("health_energy") or old.get("生命线"), "wisdom": old.get("career_mind") or old.get("智慧线"), "karma": old.get("emotional_status") or old.get("感情线"), "career": old.get("career"), "marriage": old.get("marriage")}
-    classical_defaults = {"foundation": "地纹盘桓，根基有本；守正以养元，顺时而发。", "wisdom": "人纹横展，心有权衡；藏锋守拙，谋定而后动。", "karma": "天纹牵情，情志有源；守一片真心，自得清宁。", "career": "玉柱虽幽，基业之机未尝不在；厚积其势，待时而行。", "marriage": "家风纹隐，姻缘贵在随缘守正；相敬相扶，家道自昌。"}
-    modern_defaults = {"foundation": "你可以把自己的精力当作长期资产，先稳定节奏，再慢慢积累。", "wisdom": "你的思考适合保留空间，先观察再行动，复杂问题会因此变得清楚。", "karma": "关系里保持真诚和边界，温柔表达需求，比独自猜测更能带来连接。", "career": "事业不必追求一步到位，持续积累能力和作品，机会会更容易被你接住。", "marriage": "亲密关系需要稳定沟通和共同生活目标，慢一点确认，反而更踏实。"}
+    classical_defaults = {
+        "foundation": "地纹盘桓而势稳，根基有本，气象宜藏锋蓄力；早年或多凭自持应对变化，中途虽有风雨，终能以耐性守住根脉。凡事先固其本、再图其远，顺应四时而不改初心，待时机成熟，自有厚土承载长行之路；以静制动，厚积而后发。",
+        "wisdom": "人纹横展而略有下势，心思细密，善于权衡进退；所虑既深，亦易因求全而迟疑。此象贵在收敛杂念、专注一端，将所见所学化作次第可行之策。藏锋守拙而不失果断，谋定之后稳步推进，终能在纷繁处自开清明格局；以定见行，以行证心。",
+        "karma": "天纹弧行而深浅相间，情志有源，待人重真诚而不轻许诺；缘分往往先经试探，后于相知中见其厚薄。宜守柔而有界，直抒所感，莫使未言之意积成心结。以宽厚待人、以清醒自守，情路自能由曲入平，得长久安宁；缘来不拒，缘去不执。",
+        "career": "玉柱纹由掌底向上，纵势虽淡而根气未绝，事业之机多在积累与转折之间显现；不宜急逐虚名，宜先立一技、再借众力成局。行事守信，遇变能调，便可把暂时的隐而不显化为后来的基业开拓，于实处见社会成就；功在不舍，名由实立。",
+        "marriage": "家风纹潜藏不露，姻缘之事重在相处日久、彼此扶持；情感并非骤然定局，而是在共同承担与互相体谅中渐次成形。宜以敬为先、以诚为要，给伴侣留有呼吸与成长的余地。家道贵和，守住日常温度，便能迎来成家立业之机；相扶相成，家声自远。",
+    }
+    modern_defaults = {
+        "foundation": "从地纹的走势来看，你往往愿意先把生活安顿好，再腾出空间追求变化；压力大时容易独自扛住、忽略补充能量。把长期目标拆成今天能完成的小步，每周安排固定休息与复盘，也主动向可信的人求助，稳定节奏会让你更有余力成长。",
+        "wisdom": "人纹的走向像是既重逻辑又保有想象力的人：你会反复比较细节，想把风险都想完，反而容易错过行动窗口。给每次选择设三项核心标准和明确截止时间，先用低成本的小实验验证，再根据反馈调整，不必等到百分之百确定才开始。",
+        "karma": "天纹深浅交替，说明你在关系里重视情绪温度，却不总愿意及时说出脆弱和需要；沉默久了，体贴可能变成彼此猜测。练习用“我感到”和“我需要”表达当下，每周留一段不急着解决问题的对话时间，亲近与边界就能同时被照顾。",
+        "career": "玉柱纹偏淡而仍有纵向根气，提醒你把职业看成持续校准的旅程，而非一次选择定终身。你可能在稳定与转向之间犹豫，真正的阻力是害怕投入后改变。保留现有底盘，同时用项目、课程或合作试水，让下一步建立在真实经验上，机会会更容易被接住。",
+        "marriage": "家风纹不明显时，关系更需要靠日常行动而不是等待某个确定信号。你可能同时顾及家人期待、现实责任和个人感受，疲惫若不说就会变成摩擦。和伴侣约定固定的沟通时段，分别说出感受、需求与可承担的事，慢一点确认反而更踏实。",
+    }
     analysis = {"classical": {}, "modern": {}}
     for key in LINE_KEYS:
-        analysis["classical"][key] = _bounded_long_text(classical_raw.get(key) or old_map.get(key), classical_defaults[key], "classical")
-        analysis["modern"][key] = _bounded_long_text(modern_raw.get(key) or old_map.get(key), modern_defaults[key], "modern")
+        analysis["classical"][key] = _bounded_long_text(classical_raw.get(key) or old_map.get(key), classical_defaults[key])
+        analysis["modern"][key] = _bounded_long_text(modern_raw.get(key) or old_map.get(key), modern_defaults[key])
 
     timeline_raw = raw.get("timeline") if isinstance(raw.get("timeline"), dict) else {}
     timeline = {
-        "early_years": _stage(timeline_raw.get("early_years"), "早年启蒙：潜龙勿用", "早岁如潜龙养志，宜读书观世，蓄德养器。", "早期更适合探索兴趣、建立自我感和基础能力，不必急着证明一切。"),
-        "middle_years": _stage(timeline_raw.get("middle_years"), "中流砥柱：见龙在田", "中年见龙在田，所学渐成所用；守其根本，事业可开新局。", "中年是把经验转成成果的阶段，适合聚焦优势、承担更大责任。"),
-        "later_years": _stage(timeline_raw.get("later_years"), "晚景秋收：飞龙在天", "晚景秋收，飞龙在天；功成不居，留余荫以泽后人。", "后期更适合享受积累、传递经验，并把生活重心放回从容和满足。"),
+        "early_years": _stage(timeline_raw.get("early_years"), "早年启蒙：潜龙勿用", "早年纹势初定，地纹有根而玉柱未显，正合潜龙养志之象；求学、初业与家庭期许交织，才思虽有，名位未必即彰。宜把根基筑于日常，把未成之志藏于勤行，待风来时自有腾跃之资，莫因一时迟滞而轻弃长程；守拙勤学，终见其用。", "三十岁前，你可能一面想证明自己，一面受学业、初职或家庭期待牵引，常用多做一点来换取安全感；一次挫折也容易被你看成全盘否定。把每次实践带来的能力写下来，主动向可信的人求反馈，让经历慢慢形成方向，你不必急着一次定局。"),
+        "middle_years": _stage(timeline_raw.get("middle_years"), "中流砥柱：见龙在田", "三十至五十之间，地纹仍有弧力，人纹越掌而玉柱于中段渐显，乃由试探转为担事之象；职责、合作与取舍相继而来，先承压力，后凭经验开局。宜以厚重守信用，以变通应时机，见龙在田而不忘耕云之本，方能将所学化为可持续的基业。", "三十至五十岁，工作可能从执行走向带人、负责项目或重新选择赛道，过去累积终于需要被组织成方法。忙碌时你容易把决定都集中到自己手里，关系也会因沟通不足而紧绷。明确授权、定期复盘边界，把重要关系纳入时间安排，成就才不以耗尽自己为代价。"),
+        "later_years": _stage(timeline_raw.get("later_years"), "晚景秋收：飞龙在天", "五十岁后，地纹入掌底而势渐缓，玉柱上行潜藏，天纹弧意仍存，正是由争先转为收摄、由独任转为传承之气；前半生所学宜化为识人、教人、惜缘之功。莫问高处几重天，留灯照后来者，心宽处便是秋收，余韵自能绵长；知止而后安，福泽自延。", "五十岁后，你更适合把重心从不断争取位置转向分享经验、经营兴趣与筛选真诚关系。若仍习惯独自承担，旧有责任感会遮住新的生活可能，也可能让晚辈感到距离。为自己保留固定爱好，主动传授而不替人包办，与亲友建立轻松稳定的相聚节奏。"),
     }
     return {"observations": observations, "analysis": analysis, "timeline": timeline, "master_pan_ci": _text(raw.get("master_pan_ci") or raw.get("master_quote"), "厚积成势，静守花开", 100)}
 
