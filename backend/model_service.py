@@ -129,7 +129,9 @@ OUTPUT FORMAT:
     payload = {"model": model, "temperature": 0.55, "max_tokens": 3000, "response_format": {"type": "json_object"}, "messages": [{"role": "system", "content": system_prompt}, {"role": "user", "content": content}]}
     timeout = float(os.environ.get("REQUEST_TIMEOUT_SECONDS", "90"))
     try:
-        async with httpx.AsyncClient(timeout=timeout) as client:
+        # The desktop environment may expose a stale HTTP(S)_PROXY. The configured
+        # AI endpoint is reachable directly, so do not inherit process proxy vars.
+        async with httpx.AsyncClient(timeout=timeout, trust_env=False) as client:
             response = await client.post(_endpoint(base_url), headers={"Authorization": f"Bearer {api_key}"}, json=payload)
             response.raise_for_status()
     except httpx.TimeoutException as exc:
@@ -150,7 +152,7 @@ OUTPUT FORMAT:
         )
         retry_payload = dict(payload)
         retry_payload["messages"] = list(payload["messages"]) + [{"role": "user", "content": correction}]
-        async with httpx.AsyncClient(timeout=timeout) as retry_client:
+        async with httpx.AsyncClient(timeout=timeout, trust_env=False) as retry_client:
             retry_response = await retry_client.post(_endpoint(base_url), headers={"Authorization": f"Bearer {api_key}"}, json=retry_payload)
             retry_response.raise_for_status()
         retry_text = extract_text(retry_response.json())
